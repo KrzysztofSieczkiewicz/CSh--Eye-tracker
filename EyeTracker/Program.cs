@@ -43,12 +43,14 @@ namespace EyeTracker
             var leftEyeCascade = new CascadeClassifier("./detection/haarcascade_lefteye_2splits.xml");
             var rightEyeCascade = new CascadeClassifier("./detection/haarcascade_righteye_2splits.xml");
 
-            var videoCapture = new VideoCapture(0, Emgu.CV.VideoCapture.API.DShow);
+            var videoCapture = new VideoCapture(0, VideoCapture.API.DShow);
 
             Mat frame = new();
             Mat frameGray = new();
             Mat frameBlurred = new();
             Mat frameEqualized = new();
+
+            Mat frameCropped = new();
 
             while (true)
             {
@@ -58,23 +60,34 @@ namespace EyeTracker
                 CvInvoke.GaussianBlur(frameGray, frameBlurred, new Size(5, 5), 0);
                 CvInvoke.EqualizeHist(frameGray, frameEqualized);
 
-                var faces = faceCascade.DetectMultiScale(frameEqualized, 1.2, 10);
-                var leftEye = leftEyeCascade.DetectMultiScale(frameEqualized, 1.15, 12);
-                var rightEye = rightEyeCascade.DetectMultiScale(frameEqualized, 1.15, 12);
+                var faces = DetectFace(frameEqualized);
+
+                Rectangle[] leftEyes = new Rectangle[0];
+                Rectangle[] rightEyes = new Rectangle[0];
+                if (faces != null && faces.Length > 0)
+                {
+                    frameCropped = new Mat(frameEqualized, faces[0]);
+
+                    leftEyes = DetectLeftEye(frameCropped);
+                    rightEyes = DetectRightEye(frameCropped);
+                }
 
                 if (faces != null && faces.Length > 0)
-                    CvInvoke.Rectangle(frameEqualized, faces[0], new MCvScalar(0, 255, 0), 2);
+                    foreach (var face in faces)
+                        CvInvoke.Rectangle(frame, face, new MCvScalar(0, 255, 0), 2);
+                if (faces != null && faces.Length == 0)
+                    CvInvoke.Rectangle(frameCropped, new Rectangle(new Point(50, 50), new Size(100, 100)) , new MCvScalar(0, 255, 0), 2);
 
-                if (leftEye != null && leftEye.Length > 0)
-                    CvInvoke.Rectangle(frameEqualized, leftEye[0], new MCvScalar(255, 0, 0), 1);
+                if (leftEyes != null && leftEyes.Length > 0)
+                    foreach (var leftEye in leftEyes)
+                        CvInvoke.Rectangle(frameCropped, leftEye, new MCvScalar(255, 0, 0), 1);
 
-                if (rightEye != null && rightEye.Length > 0)
-                    CvInvoke.Rectangle(frameEqualized, rightEye[0], new MCvScalar(255, 0, 0), 1);
+                if (rightEyes != null && rightEyes.Length > 0)
+                    foreach (var rightEye in rightEyes)
+                        CvInvoke.Rectangle(frameCropped, rightEye, new MCvScalar(255, 0, 0), 1);
 
-                CvInvoke.Rectangle(frameEqualized, new Rectangle(new Point(10, 10), new Size(50, 50)), new MCvScalar(255, 0, 0), 1);
 
-
-                CvInvoke.Imshow("faceDetection", frameEqualized);
+                CvInvoke.Imshow("faceDetection", frameCropped);
 
                 if (CvInvoke.WaitKey(1) == 27)
                     break;
@@ -85,7 +98,7 @@ namespace EyeTracker
         {
             var faceClassifier = new CascadeClassifier("./detection/haarcascade_frontalface_default.xml");
             double scaleFactor = 1.2;
-            int minNeighbours = 10;
+            int minNeighbours = 4;
             Size minSize = new Size(110, 110);
             Size maxSize = new Size(275, 275);
 
@@ -98,12 +111,36 @@ namespace EyeTracker
         {
             var eyeClassifier = new CascadeClassifier("./detection/haarcascade_lefteye_2splits.xml");
             double scaleFactor = 1.15;
-            int minNeighbours = 12;
+            int minNeighbours = 3;
 
-            var leftEyeRectangles = eyeClassifier.DetectMultiScale(image, scaleFactor, minNeighbours);
+            // Crop the image
+            int centerX = (int)(image.Cols / 2);
+            Rectangle cropArea = new Rectangle(centerX, 0, centerX, (int)image.Rows);
+            Mat croppedImage = new Mat(image, cropArea);
+
+            var leftEyeRectangles = eyeClassifier.DetectMultiScale(croppedImage, scaleFactor, minNeighbours);
+
+            // Move rectangles to match original image coordinates
+            for (int i = 0; i < leftEyeRectangles.Length; i++)
+                leftEyeRectangles[i].X += centerX;
 
             return leftEyeRectangles;
         }
 
+        public static Rectangle[] DetectRightEye(Mat image)
+        {
+            var eyeClassifier = new CascadeClassifier("./detection/haarcascade_righteye_2splits.xml");
+            double scaleFactor = 1.15;
+            int minNeighbours = 3;
+
+            // Crop the image
+            int centerX = (int)(image.Cols / 2);
+            Rectangle cropArea = new Rectangle(0, 0, centerX, (int)image.Rows);
+            Mat croppedImage = new Mat(image, cropArea);
+
+            var rightEyeRectangles = eyeClassifier.DetectMultiScale(croppedImage, scaleFactor, minNeighbours);
+
+            return rightEyeRectangles;
+        }
     }
 }
