@@ -1,4 +1,5 @@
 using Emgu.CV;
+using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using System.Diagnostics;
 
@@ -57,13 +58,17 @@ namespace EyeTracker
 
                 Rectangle[] leftEyes = new Rectangle[0];
                 Rectangle[] rightEyes = new Rectangle[0];
+                Rectangle[] noses = new Rectangle[0];
                 if (faces != null && faces.Length > 0)
                 {
                     Mat frameFaceCropped = new Mat(frameEqualized, faces[0]);
 
+                    noses = DetectNose(frameFaceCropped);
+
                     leftEyes = DetectLeftEye(frameFaceCropped);
                     rightEyes = DetectRightEye(frameFaceCropped);
 
+                    // TODO: ADD ERROR HANDLING FOR DETECTION
                     Mat frameLeftEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
                     Mat frameRightEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
 
@@ -78,6 +83,9 @@ namespace EyeTracker
                     if (faces != null && faces.Length == 0)
                         CvInvoke.Rectangle(frameFaceCropped, new Rectangle(new Point(50, 50), new Size(100, 100)) , new MCvScalar(0, 255, 0), 2);
 
+                    if (noses != null  && noses.Length > 0)
+                        foreach( var nose in noses)
+                            CvInvoke.Rectangle(frameFaceCropped, nose, new MCvScalar(255, 0, 0), 1);
                     if (leftEyes != null && leftEyes.Length > 0)
                         foreach (var leftEye in leftEyes)
                             CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
@@ -95,7 +103,7 @@ namespace EyeTracker
             }
         }
 
-        public static Rectangle[] DetectFace(Mat image)
+        private static Rectangle[] DetectFace(Mat image)
         {
             var faceClassifier = new CascadeClassifier("./detection/haarcascade_frontalface_default.xml");
             double scaleFactor = 1.2;
@@ -108,7 +116,7 @@ namespace EyeTracker
             return faceRectangles;
         }
 
-        public static Rectangle[] DetectLeftEye(Mat image)
+        private static Rectangle[] DetectLeftEye(Mat image)
         {
             var eyeClassifier = new CascadeClassifier("./detection/haarcascade_lefteye_2splits.xml");
             double scaleFactor = 1.15;
@@ -128,7 +136,7 @@ namespace EyeTracker
             return leftEyeRectangles;
         }
 
-        public static Rectangle[] DetectRightEye(Mat image)
+        private static Rectangle[] DetectRightEye(Mat image)
         {
             var eyeClassifier = new CascadeClassifier("./detection/haarcascade_righteye_2splits.xml");
             double scaleFactor = 1.15;
@@ -142,6 +150,30 @@ namespace EyeTracker
             var rightEyeRectangles = eyeClassifier.DetectMultiScale(croppedImage, scaleFactor, minNeighbours);
 
             return rightEyeRectangles;
+        }
+
+        private static Rectangle[] DetectNose(Mat image)
+        {
+            var noseClassifier = new CascadeClassifier("./detection/haarcascade_mcs_nose.xml");
+            double scaleFactor = 1.15;
+            int minNeighbours = 3;
+
+            var rightEyeRectangles = noseClassifier.DetectMultiScale(image, scaleFactor, minNeighbours);
+
+            return rightEyeRectangles;
+        }
+
+        private static double CalculateFaceRoll(Point leftEyeCenter, Point rightEyeCenter)
+        {
+            var leftX = leftEyeCenter.X;
+            var leftY = leftEyeCenter.Y;
+            var rightX = rightEyeCenter.X;
+            var rightY = rightEyeCenter.Y;
+
+            var diffX = leftX - rightX;
+            var diffY = leftY - rightY;
+            
+            return Math.Atan2(diffY, diffX);
         }
     }
 }

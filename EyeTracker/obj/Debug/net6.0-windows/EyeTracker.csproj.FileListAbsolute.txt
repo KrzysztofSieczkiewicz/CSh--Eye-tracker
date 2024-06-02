@@ -59,3 +59,4 @@ C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection
 C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_lefteye_2splits.xml
 C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_righteye_2splits.xml
 C:\Kristoff\Programming\EyeTracker\EyeTracker\obj\Debug\net6.0-windows\EyeTracker.sourcelink.json
+C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_mcs_nose.xml
