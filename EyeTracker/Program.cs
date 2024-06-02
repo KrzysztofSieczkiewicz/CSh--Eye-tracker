@@ -1,7 +1,5 @@
 using Emgu.CV;
-using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
-using System.Diagnostics;
 
 namespace EyeTracker
 {
@@ -11,7 +9,7 @@ namespace EyeTracker
         [STAThread]
         static void Main()
         {
-            FaceDetection();
+            Detection();
             /*
             Mat picture = new Mat();
 
@@ -37,7 +35,7 @@ namespace EyeTracker
             //Application.Run(new Form1());
         }
 
-        public static void FaceDetection()
+        public static void Detection()
         {
             var videoCapture = new VideoCapture(0, VideoCapture.API.DShow);
 
@@ -46,65 +44,70 @@ namespace EyeTracker
             Mat frameBlurred = new();
             Mat frameEqualized = new();
 
+            Rectangle[] oldFaces = new Rectangle[0];
+            Rectangle[] oldNoses = new Rectangle[0];
+            Rectangle[] oldLeftEyes = new Rectangle[0];
+            Rectangle[] oldRightEyes = new Rectangle[0];
+
             while (true)
             {
+                // CAPTURE AND PROCESS THE IMAGE
                 videoCapture.Read(frame);
-
                 CvInvoke.CvtColor(frame, frameGray, Emgu.CV.CvEnum.ColorConversion.Bgr2Gray);
                 CvInvoke.GaussianBlur(frameGray, frameBlurred, new Size(5, 5), 0);
                 CvInvoke.EqualizeHist(frameGray, frameEqualized);
+                
 
+                // DETECT FACE
                 var faces = DetectFace(frameEqualized);
+                var face = TemporalSmoothing(oldFaces, faces); // TODO: MOVE THIS INTO DETECTION METHOD
 
-                Rectangle[] leftEyes = new Rectangle[0];
-                Rectangle[] rightEyes = new Rectangle[0];
-                Rectangle[] noses = new Rectangle[0];
-                if (faces != null && faces.Length > 0)
+                Mat frameFaceCropped = new Mat(frameEqualized, face);
+
+                var noses = DetectNose(frameFaceCropped);
+                var nose = TemporalSmoothing(oldNoses, noses);
+                var leftEyes = DetectLeftEye(frameFaceCropped);
+                var leftEye = TemporalSmoothing(oldLeftEyes, leftEyes);
+                var rightEyes = DetectRightEye(frameFaceCropped);
+                var rightEye = TemporalSmoothing(oldRightEyes, rightEyes);
+
+                if (noses != null && noses.Length > 0
+                    && leftEyes != null && leftEyes.Length > 0
+                    && rightEyes != null && rightEyes.Length > 0)
                 {
-                    Mat frameFaceCropped = new Mat(frameEqualized, faces[0]);
-
-                    noses = DetectNose(frameFaceCropped);
-                    leftEyes = DetectLeftEye(frameFaceCropped);
-                    rightEyes = DetectRightEye(frameFaceCropped);
-
-                    // TODO: ADD ERROR HANDLING FOR DETECTION -> IT CAN CRASH IF YOU BLINK
+                    // TAKE PICTURE OF EACH EYE
                     Mat frameLeftEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
                     Mat frameRightEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
 
                     // TODO: BASED ON EYES RECTANGLES POSITION -> CALCULATE FACE ORIENTATION IN RELATION TO THE SCREEN NORMAL AXIS
-
                     // TODO: RECOGNIZE EYE IRIS FOR EACH EYE
-                
+
 
                     if (faces != null && faces.Length > 0)
-                        foreach (var face in faces)
-                            CvInvoke.Rectangle(frame, face, new MCvScalar(0, 255, 0), 2);
-                    if (faces != null && faces.Length == 0)
-                        CvInvoke.Rectangle(frameFaceCropped, new Rectangle(new Point(50, 50), new Size(100, 100)) , new MCvScalar(0, 255, 0), 2);
-
-                    if (noses != null  && noses.Length > 0)
-                        foreach( var nose in noses)
-                            CvInvoke.Rectangle(frameFaceCropped, nose, new MCvScalar(255, 0, 0), 1);
+                        CvInvoke.Rectangle(frameFaceCropped, face, new MCvScalar(0, 255, 0), 2);
+                    if (noses != null && noses.Length > 0)
+                        foreach(var noser in noses)
+                        CvInvoke.Rectangle(frameFaceCropped, noser, new MCvScalar(255, 0, 0), 1);
                     if (leftEyes != null && leftEyes.Length > 0)
-                        foreach (var leftEye in leftEyes)
-                            CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
-
+                        CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
                     if (rightEyes != null && rightEyes.Length > 0)
-                        foreach (var rightEye in rightEyes)
-                            CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
+                        CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
 
                     var leftEyeCenter = new Point(leftEyes[0].Location.X + leftEyes[0].Width, leftEyes[0].Location.Y + leftEyes[0].Height);
                     var rightEyeCenter = new Point(rightEyes[0].Location.X + rightEyes[0].Width, rightEyes[0].Location.Y + rightEyes[0].Height);
                     var noseCenter = new Point(noses[0].Location.X + noses[0].Width, noses[0].Location.Y + noses[0].Height);
+
+                    var yaw = CalculateFaceYaw(leftEyeCenter, rightEyeCenter, noseCenter);
                     var roll = CalculateFaceRoll(leftEyeCenter, rightEyeCenter);
                     var pitch = CalculateFacePitch(leftEyeCenter, rightEyeCenter, noseCenter);
 
-                    CvInvoke.PutText(frameFaceCropped, "YAW: " + roll.ToString(), new Point(15, 30), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(255, 0, 0));
-                    CvInvoke.PutText(frameFaceCropped, "PITCH: " + pitch.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(255, 0, 0));
-
+                    CvInvoke.PutText(frameFaceCropped, "YAW: " + yaw.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
+                    //CvInvoke.PutText(frameFaceCropped, "ROLL: " + roll.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
+                    //CvInvoke.PutText(frameFaceCropped, "PITCH: " + pitch.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
 
                     CvInvoke.Imshow("faceDetection", frameFaceCropped);
                 }
+                
 
                 if (CvInvoke.WaitKey(1) == 27)
                     break;
@@ -163,39 +166,61 @@ namespace EyeTracker
         private static Rectangle[] DetectNose(Mat image)
         {
             var noseClassifier = new CascadeClassifier("./detection/haarcascade_mcs_nose.xml");
-            double scaleFactor = 1.15;
-            int minNeighbours = 3;
+            double scaleFactor = 1.4;
+            int minNeighbours = 8;
 
             var rightEyeRectangles = noseClassifier.DetectMultiScale(image, scaleFactor, minNeighbours);
 
             return rightEyeRectangles;
         }
 
-        private static double CalculateFaceRoll(Point leftEyeCenter, Point rightEyeCenter)
+        private static Rectangle TemporalSmoothing(Rectangle[] oldPositions, Rectangle[] newPositions)
         {
-            var leftX = leftEyeCenter.X;
-            var leftY = leftEyeCenter.Y;
-            var rightX = rightEyeCenter.X;
-            var rightY = rightEyeCenter.Y;
+            if (newPositions.Length == 0) return default;
 
-            double roll = Math.Atan2(rightEyeCenter.Y - leftEyeCenter.Y, rightEyeCenter.X - leftEyeCenter.X);
-            //double pitch = Math.Atan2(noseCenter.Y - ((leftEyeCenter.Y + rightEyeCenter.Y) / 2), noseCenter.X - ((leftEyeCenter.X + rightEyeCenter.X) / 2));
+            Rectangle averagedPosition = newPositions[0];
 
-            return roll;
+            for (int i = 1; i < newPositions.Length; i++)
+            {
+                averagedPosition.X = (averagedPosition.X + newPositions[i].X) / 2;
+                averagedPosition.Y = (averagedPosition.Y + newPositions[i].Y) / 2;
+                averagedPosition.Width = (averagedPosition.Width + newPositions[i].Width) / 2;
+                averagedPosition.Height = (averagedPosition.Height + newPositions[i].Height) / 2;
+            }
+
+            return averagedPosition;
+        }
+
+
+        private static double CalculateFaceYaw(Point leftEyeCenter, Point rightEyeCenter, Point noseCenter)
+        {
+            double yaw = Math.Atan2(noseCenter.Y - ((leftEyeCenter.Y + rightEyeCenter.Y) / 2), noseCenter.X - ((leftEyeCenter.X + rightEyeCenter.X) / 2));
+
+            yaw = yaw * 180 / Math.PI;
+
+            return yaw;
         }
 
         private static double CalculateFacePitch(Point leftEyeCenter, Point rightEyeCenter, Point noseCenter)
         {
-            var leftX = leftEyeCenter.X;
-            var leftY = leftEyeCenter.Y;
-            var rightX = rightEyeCenter.X;
-            var rightY = rightEyeCenter.Y;
-            var noseX = noseCenter.X;
-            var noseY = noseCenter.Y;
+            double eyeHorizontalDistance = Math.Abs(leftEyeCenter.X - rightEyeCenter.X);
+            double eyeNoseVerticalDistance = Math.Abs((leftEyeCenter.Y + rightEyeCenter.Y) / 2 - noseCenter.Y);
+            double eyeVerticalDistance = Math.Abs(leftEyeCenter.Y - rightEyeCenter.Y);
 
-            double pitch = Math.Atan2(noseCenter.Y - ((leftEyeCenter.Y + rightEyeCenter.Y) / 2), noseCenter.X - ((leftEyeCenter.X + rightEyeCenter.X) / 2));
+            double pitch = Math.Acos(eyeNoseVerticalDistance / eyeHorizontalDistance);
+
+            pitch = pitch * 180 / Math.PI;
 
             return pitch;
+        }
+
+        private static double CalculateFaceRoll(Point leftEyeCenter, Point rightEyeCenter)
+        {
+            double roll = Math.Atan2(rightEyeCenter.Y - leftEyeCenter.Y, rightEyeCenter.X - leftEyeCenter.X);
+
+            roll = roll * 180 / Math.PI;
+
+            return roll;
         }
     }
 }
