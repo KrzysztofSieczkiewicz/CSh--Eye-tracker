@@ -64,11 +64,10 @@ namespace EyeTracker
                     Mat frameFaceCropped = new Mat(frameEqualized, faces[0]);
 
                     noses = DetectNose(frameFaceCropped);
-
                     leftEyes = DetectLeftEye(frameFaceCropped);
                     rightEyes = DetectRightEye(frameFaceCropped);
 
-                    // TODO: ADD ERROR HANDLING FOR DETECTION
+                    // TODO: ADD ERROR HANDLING FOR DETECTION -> IT CAN CRASH IF YOU BLINK
                     Mat frameLeftEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
                     Mat frameRightEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
 
@@ -93,6 +92,15 @@ namespace EyeTracker
                     if (rightEyes != null && rightEyes.Length > 0)
                         foreach (var rightEye in rightEyes)
                             CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
+
+                    var leftEyeCenter = new Point(leftEyes[0].Location.X + leftEyes[0].Width, leftEyes[0].Location.Y + leftEyes[0].Height);
+                    var rightEyeCenter = new Point(rightEyes[0].Location.X + rightEyes[0].Width, rightEyes[0].Location.Y + rightEyes[0].Height);
+                    var noseCenter = new Point(noses[0].Location.X + noses[0].Width, noses[0].Location.Y + noses[0].Height);
+                    var roll = CalculateFaceRoll(leftEyeCenter, rightEyeCenter);
+                    var pitch = CalculateFacePitch(leftEyeCenter, rightEyeCenter, noseCenter);
+
+                    CvInvoke.PutText(frameFaceCropped, "YAW: " + roll.ToString(), new Point(15, 30), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(255, 0, 0));
+                    CvInvoke.PutText(frameFaceCropped, "PITCH: " + pitch.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.5, new MCvScalar(255, 0, 0));
 
 
                     CvInvoke.Imshow("faceDetection", frameFaceCropped);
@@ -170,10 +178,24 @@ namespace EyeTracker
             var rightX = rightEyeCenter.X;
             var rightY = rightEyeCenter.Y;
 
-            var diffX = leftX - rightX;
-            var diffY = leftY - rightY;
-            
-            return Math.Atan2(diffY, diffX);
+            double roll = Math.Atan2(rightEyeCenter.Y - leftEyeCenter.Y, rightEyeCenter.X - leftEyeCenter.X);
+            //double pitch = Math.Atan2(noseCenter.Y - ((leftEyeCenter.Y + rightEyeCenter.Y) / 2), noseCenter.X - ((leftEyeCenter.X + rightEyeCenter.X) / 2));
+
+            return roll;
+        }
+
+        private static double CalculateFacePitch(Point leftEyeCenter, Point rightEyeCenter, Point noseCenter)
+        {
+            var leftX = leftEyeCenter.X;
+            var leftY = leftEyeCenter.Y;
+            var rightX = rightEyeCenter.X;
+            var rightY = rightEyeCenter.Y;
+            var noseX = noseCenter.X;
+            var noseY = noseCenter.Y;
+
+            double pitch = Math.Atan2(noseCenter.Y - ((leftEyeCenter.Y + rightEyeCenter.Y) / 2), noseCenter.X - ((leftEyeCenter.X + rightEyeCenter.X) / 2));
+
+            return pitch;
         }
     }
 }
