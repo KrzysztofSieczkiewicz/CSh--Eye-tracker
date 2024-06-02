@@ -10,7 +10,6 @@ namespace EyeTracker
         [STAThread]
         static void Main()
         {
-
             FaceDetection();
             /*
             Mat picture = new Mat();
@@ -39,18 +38,12 @@ namespace EyeTracker
 
         public static void FaceDetection()
         {
-            var faceCascade = new CascadeClassifier("./detection/haarcascade_frontalface_default.xml");
-            var leftEyeCascade = new CascadeClassifier("./detection/haarcascade_lefteye_2splits.xml");
-            var rightEyeCascade = new CascadeClassifier("./detection/haarcascade_righteye_2splits.xml");
-
             var videoCapture = new VideoCapture(0, VideoCapture.API.DShow);
 
             Mat frame = new();
             Mat frameGray = new();
             Mat frameBlurred = new();
             Mat frameEqualized = new();
-
-            Mat frameCropped = new();
 
             while (true)
             {
@@ -66,28 +59,36 @@ namespace EyeTracker
                 Rectangle[] rightEyes = new Rectangle[0];
                 if (faces != null && faces.Length > 0)
                 {
-                    frameCropped = new Mat(frameEqualized, faces[0]);
+                    Mat frameFaceCropped = new Mat(frameEqualized, faces[0]);
 
-                    leftEyes = DetectLeftEye(frameCropped);
-                    rightEyes = DetectRightEye(frameCropped);
+                    leftEyes = DetectLeftEye(frameFaceCropped);
+                    rightEyes = DetectRightEye(frameFaceCropped);
+
+                    Mat frameLeftEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
+                    Mat frameRightEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
+
+                    // TODO: BASED ON EYES RECTANGLES POSITION -> CALCULATE FACE ORIENTATION IN RELATION TO THE SCREEN NORMAL AXIS
+
+                    // TODO: RECOGNIZE EYE IRIS FOR EACH EYE
+                
+
+                    if (faces != null && faces.Length > 0)
+                        foreach (var face in faces)
+                            CvInvoke.Rectangle(frame, face, new MCvScalar(0, 255, 0), 2);
+                    if (faces != null && faces.Length == 0)
+                        CvInvoke.Rectangle(frameFaceCropped, new Rectangle(new Point(50, 50), new Size(100, 100)) , new MCvScalar(0, 255, 0), 2);
+
+                    if (leftEyes != null && leftEyes.Length > 0)
+                        foreach (var leftEye in leftEyes)
+                            CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
+
+                    if (rightEyes != null && rightEyes.Length > 0)
+                        foreach (var rightEye in rightEyes)
+                            CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
+
+
+                    CvInvoke.Imshow("faceDetection", frameFaceCropped);
                 }
-
-                if (faces != null && faces.Length > 0)
-                    foreach (var face in faces)
-                        CvInvoke.Rectangle(frame, face, new MCvScalar(0, 255, 0), 2);
-                if (faces != null && faces.Length == 0)
-                    CvInvoke.Rectangle(frameCropped, new Rectangle(new Point(50, 50), new Size(100, 100)) , new MCvScalar(0, 255, 0), 2);
-
-                if (leftEyes != null && leftEyes.Length > 0)
-                    foreach (var leftEye in leftEyes)
-                        CvInvoke.Rectangle(frameCropped, leftEye, new MCvScalar(255, 0, 0), 1);
-
-                if (rightEyes != null && rightEyes.Length > 0)
-                    foreach (var rightEye in rightEyes)
-                        CvInvoke.Rectangle(frameCropped, rightEye, new MCvScalar(255, 0, 0), 1);
-
-
-                CvInvoke.Imshow("faceDetection", frameCropped);
 
                 if (CvInvoke.WaitKey(1) == 27)
                     break;
