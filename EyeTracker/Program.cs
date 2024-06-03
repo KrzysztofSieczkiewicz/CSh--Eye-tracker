@@ -44,10 +44,10 @@ namespace EyeTracker
             Mat frameBlurred = new();
             Mat frameEqualized = new();
 
-            Rectangle[] oldFaces = new Rectangle[0];
-            Rectangle[] oldNoses = new Rectangle[0];
-            Rectangle[] oldLeftEyes = new Rectangle[0];
-            Rectangle[] oldRightEyes = new Rectangle[0];
+            Rectangle[] prevFrameFaces = new Rectangle[0];
+            Rectangle[] prevFrameNoses = new Rectangle[0];
+            Rectangle[] prevFrameLeftEyes = new Rectangle[0];
+            Rectangle[] prevFrameRightEyes = new Rectangle[0];
 
             while (true)
             {
@@ -60,16 +60,23 @@ namespace EyeTracker
 
                 // DETECT FACE
                 var faces = DetectFace(frameEqualized);
-                var face = TemporalSmoothing(oldFaces, faces); // TODO: MOVE THIS INTO DETECTION METHOD
+                var face = TemporalSmoothing(prevFrameFaces, faces); // TODO: MOVE THIS INTO DETECTION METHOD?
 
                 Mat frameFaceCropped = new Mat(frameEqualized, face);
 
+                // DETECT FEATURES
                 var noses = DetectNose(frameFaceCropped);
-                var nose = TemporalSmoothing(oldNoses, noses);
+                var nose = TemporalSmoothing(prevFrameNoses, noses);
                 var leftEyes = DetectLeftEye(frameFaceCropped);
-                var leftEye = TemporalSmoothing(oldLeftEyes, leftEyes);
+                var leftEye = TemporalSmoothing(prevFrameLeftEyes, leftEyes);
                 var rightEyes = DetectRightEye(frameFaceCropped);
-                var rightEye = TemporalSmoothing(oldRightEyes, rightEyes);
+                var rightEye = TemporalSmoothing(prevFrameRightEyes, rightEyes);
+
+                // OVERWRITE PREVIOUS FRAME
+                prevFrameFaces = faces;
+                prevFrameNoses = noses;
+                prevFrameLeftEyes = leftEyes;
+                prevFrameRightEyes = rightEyes;
 
                 if (noses != null && noses.Length > 0
                     && leftEyes != null && leftEyes.Length > 0
@@ -79,6 +86,7 @@ namespace EyeTracker
                     Mat frameLeftEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
                     Mat frameRightEyeCropped = new Mat(frameFaceCropped, leftEyes[0]);
 
+                    // TODO: CALCULATE VARIATION OF FACE POSITION -> IF TOO LARGE - skip frame (also can be used for creating gaze radius)
                     // TODO: BASED ON EYES RECTANGLES POSITION -> CALCULATE FACE ORIENTATION IN RELATION TO THE SCREEN NORMAL AXIS
                     // TODO: RECOGNIZE EYE IRIS FOR EACH EYE
 
@@ -130,7 +138,7 @@ namespace EyeTracker
         private static Rectangle[] DetectLeftEye(Mat image)
         {
             var eyeClassifier = new CascadeClassifier("./detection/haarcascade_lefteye_2splits.xml");
-            double scaleFactor = 1.15;
+            double scaleFactor = 1.1;
             int minNeighbours = 3;
 
             // Crop the image
@@ -150,7 +158,7 @@ namespace EyeTracker
         private static Rectangle[] DetectRightEye(Mat image)
         {
             var eyeClassifier = new CascadeClassifier("./detection/haarcascade_righteye_2splits.xml");
-            double scaleFactor = 1.15;
+            double scaleFactor = 1.1;
             int minNeighbours = 3;
 
             // Crop the image
@@ -166,7 +174,7 @@ namespace EyeTracker
         private static Rectangle[] DetectNose(Mat image)
         {
             var noseClassifier = new CascadeClassifier("./detection/haarcascade_mcs_nose.xml");
-            double scaleFactor = 1.4;
+            double scaleFactor = 1.1;
             int minNeighbours = 8;
 
             var rightEyeRectangles = noseClassifier.DetectMultiScale(image, scaleFactor, minNeighbours);
@@ -196,7 +204,7 @@ namespace EyeTracker
         {
             double yaw = Math.Atan2(noseCenter.Y - ((leftEyeCenter.Y + rightEyeCenter.Y) / 2), noseCenter.X - ((leftEyeCenter.X + rightEyeCenter.X) / 2));
 
-            yaw = yaw * 180 / Math.PI;
+            yaw = (yaw * 180 / Math.PI) - 90;
 
             return yaw;
         }
@@ -209,7 +217,7 @@ namespace EyeTracker
 
             double pitch = Math.Acos(eyeNoseVerticalDistance / eyeHorizontalDistance);
 
-            pitch = pitch * 180 / Math.PI;
+            pitch = (pitch * 180 / Math.PI) - 45;
 
             return pitch;
         }
