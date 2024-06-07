@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EyeTracker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ddee487c2a097e855692d827832c2191327ebca")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0685f8129711af8b91cfd73f09935392e05bd54a")]
 [assembly: System.Reflection.AssemblyProductAttribute("EyeTracker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EyeTracker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

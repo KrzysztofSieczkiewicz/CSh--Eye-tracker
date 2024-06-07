@@ -124,7 +124,7 @@ namespace EyeTracker
 
         private static Rectangle[] DetectFace(Mat image)
         {
-            var faceClassifier = new CascadeClassifier("./detection/haarcascade_frontalface_default.xml");
+            var faceClassifier = new CascadeClassifier("./classifiers/haarcascade_frontalface_default.xml");
             double scaleFactor = 1.2;
             int minNeighbours = 4;
             Size minSize = new Size(110, 110);
@@ -137,7 +137,7 @@ namespace EyeTracker
 
         private static Rectangle[] DetectLeftEye(Mat image)
         {
-            var eyeClassifier = new CascadeClassifier("./detection/haarcascade_lefteye_2splits.xml");
+            var eyeClassifier = new CascadeClassifier("./classifiers/haarcascade_lefteye_2splits.xml");
             double scaleFactor = 1.1;
             int minNeighbours = 3;
 
@@ -157,7 +157,7 @@ namespace EyeTracker
 
         private static Rectangle[] DetectRightEye(Mat image)
         {
-            var eyeClassifier = new CascadeClassifier("./detection/haarcascade_righteye_2splits.xml");
+            var eyeClassifier = new CascadeClassifier("./classifiers/haarcascade_righteye_2splits.xml");
             double scaleFactor = 1.1;
             int minNeighbours = 3;
 
@@ -173,7 +173,7 @@ namespace EyeTracker
 
         private static Rectangle[] DetectNose(Mat image)
         {
-            var noseClassifier = new CascadeClassifier("./detection/haarcascade_mcs_nose.xml");
+            var noseClassifier = new CascadeClassifier("./classifiers/haarcascade_mcs_nose.xml");
             double scaleFactor = 1.1;
             int minNeighbours = 8;
 

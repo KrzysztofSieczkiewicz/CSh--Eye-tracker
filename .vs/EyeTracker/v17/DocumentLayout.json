@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "C:\\Kristoff\\Programming\\EyeTracker\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\facedetection\\haarfacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\facedetection\\haarfacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\detection\\face\\haarfacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\detection\\face\\haarfacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\detection\\utlis\\detectionutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\detection\\utlis\\detectionutils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\facedetection\\ifacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\facedetection\\ifacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\detection\\prevdetections.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\detection\\prevdetections.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|c:\\kristoff\\programming\\eyetracker\\eyetracker\\detection\\face\\ifacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{81C2A676-4B6E-444C-BB52-D5BF44DA2314}|EyeTracker\\EyeTracker.csproj|solutionrelative:eyetracker\\detection\\face\\ifacedetector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,17 +26,43 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "PrevDetections.cs",
+              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\PrevDetections.cs",
+              "RelativeDocumentMoniker": "EyeTracker\\detection\\PrevDetections.cs",
+              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\PrevDetections.cs",
+              "RelativeToolTip": "EyeTracker\\detection\\PrevDetections.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-07T10:57:15.652Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DetectionUtils.cs",
+              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\utlis\\DetectionUtils.cs",
+              "RelativeDocumentMoniker": "EyeTracker\\detection\\utlis\\DetectionUtils.cs",
+              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\utlis\\DetectionUtils.cs",
+              "RelativeToolTip": "EyeTracker\\detection\\utlis\\DetectionUtils.cs",
+              "ViewState": "AQIAABMAAAAAAAAAAAAQwB4AAABQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-07T10:25:18.963Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "IFaceDetector.cs",
-              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\faceDetection\\IFaceDetector.cs",
-              "RelativeDocumentMoniker": "EyeTracker\\faceDetection\\IFaceDetector.cs",
-              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\faceDetection\\IFaceDetector.cs",
-              "RelativeToolTip": "EyeTracker\\faceDetection\\IFaceDetector.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAUAAAA",
+              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\face\\IFaceDetector.cs",
+              "RelativeDocumentMoniker": "EyeTracker\\detection\\face\\IFaceDetector.cs",
+              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\face\\IFaceDetector.cs",
+              "RelativeToolTip": "EyeTracker\\detection\\face\\IFaceDetector.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAARAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-06T21:01:05.735Z",
               "EditorCaption": ""
@@ -41,26 +71,13 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "HaarFaceDetector.cs",
-              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\faceDetection\\HaarFaceDetector.cs",
-              "RelativeDocumentMoniker": "EyeTracker\\faceDetection\\HaarFaceDetector.cs",
-              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\faceDetection\\HaarFaceDetector.cs",
-              "RelativeToolTip": "EyeTracker\\faceDetection\\HaarFaceDetector.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAAA4AAAAAAAAA",
+              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\face\\HaarFaceDetector.cs",
+              "RelativeDocumentMoniker": "EyeTracker\\detection\\face\\HaarFaceDetector.cs",
+              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\detection\\face\\HaarFaceDetector.cs",
+              "RelativeToolTip": "EyeTracker\\detection\\face\\HaarFaceDetector.cs",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAAwBcAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-06T20:59:06.902Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\Program.cs",
-              "RelativeDocumentMoniker": "EyeTracker\\Program.cs",
-              "ToolTip": "C:\\Kristoff\\Programming\\EyeTracker\\EyeTracker\\Program.cs",
-              "RelativeToolTip": "EyeTracker\\Program.cs",
-              "ViewState": "AQIAACIAAAAAAAAAAAAQwH8AAAAMAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-30T13:15:01.961Z",
               "EditorCaption": ""
             }
           ]
