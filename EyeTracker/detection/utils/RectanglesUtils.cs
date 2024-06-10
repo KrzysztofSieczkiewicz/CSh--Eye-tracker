@@ -1,6 +1,6 @@
 ﻿namespace EyeTracker.detection.utlis
 {
-    internal static class DetectionUtils
+    internal static class RectanglesUtils
     {
 
         public static Rectangle SpatialSmoothing(Rectangle[] rectangles)
