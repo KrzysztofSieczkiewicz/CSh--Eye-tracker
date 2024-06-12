@@ -54,9 +54,9 @@ C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\img\test0
 C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\System.CodeDom.dll
 C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\System.Management.dll
 C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Management.dll
-C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_frontalface_default.xml
-C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_frontalcatface_extended.xml
-C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_lefteye_2splits.xml
-C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_righteye_2splits.xml
 C:\Kristoff\Programming\EyeTracker\EyeTracker\obj\Debug\net6.0-windows\EyeTracker.sourcelink.json
-C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\detection\haarcascade_mcs_nose.xml
+C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\classifiers\haarcascade_frontalcatface_extended.xml
+C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\classifiers\haarcascade_frontalface_default.xml
+C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\classifiers\haarcascade_lefteye_2splits.xml
+C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\classifiers\haarcascade_mcs_nose.xml
+C:\Kristoff\Programming\EyeTracker\EyeTracker\bin\Debug\net6.0-windows\classifiers\haarcascade_righteye_2splits.xml

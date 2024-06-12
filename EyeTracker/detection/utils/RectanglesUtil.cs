@@ -1,8 +1,18 @@
 ﻿namespace EyeTracker.detection.utlis
 {
-    internal static class RectanglesUtils
+    internal static class RectanglesUtil
     {
+        /* 
+         * Calculates center point for provided rectangle
+        */
+        public static Point GetCenter(Rectangle rect)
+        {
+            return new Point(rect.Location.X + rect.Width, rect.Location.Y + rect.Height);
+        }
 
+        /* 
+         * Averages provided rectangles
+        */
         public static Rectangle SpatialSmoothing(Rectangle[] rectangles)
         {
             int sumX=0;
@@ -28,7 +38,7 @@
         }
 
         /* 
-         * Averages current and previous detection frame to reduce detection jitter 
+         * Averages provided collection and averages it again with with current
         */
         public static Rectangle TemporalSmoothing(Rectangle[] prevFramesRect, Rectangle currFrameRect)
         {
