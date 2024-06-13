@@ -52,10 +52,10 @@ namespace EyeTracker
             Mat frameBlurred = new();
             Mat frameEqualized = new();
 
-            IFeatureDetector faceDetector = new HaarFaceDetector();
-            IFeatureDetector noseDetector = new HaarNoseDetector();
-            IFeatureDetector lEyeDetector = new HaarLeftEyeDetector();
-            IFeatureDetector rEyeDetector = new HaarRightEyeDetector();
+            HaarFaceDetector faceDetector = new HaarFaceDetector();
+            HaarNoseDetector noseDetector = new HaarNoseDetector();
+            HaarLeftEyeDetector lEyeDetector = new HaarLeftEyeDetector();
+            HaarRightEyeDetector rEyeDetector = new HaarRightEyeDetector();
 
             while (true)
             {
@@ -65,17 +65,14 @@ namespace EyeTracker
                 CvInvoke.GaussianBlur(frameGray, frameBlurred, new Size(5, 5), 0);
                 CvInvoke.EqualizeHist(frameGray, frameEqualized);
 
-                // TODO: MAKE FACE DETECTOR RETURN CROPPED IMAGE INSTEAD (MAYBE MAKE SEPARATE METHOD).
-                // SO IF THERE IS NO FACE DETECTED, IT SHOULD RETURN ORIGINAL IMAGE
-
                 // DETECT FACE AND CROP IMAGE
-                var face = faceDetector.Detect(frameEqualized);
-                Mat frameFaceCropped = new Mat(frameEqualized, face);
+                Mat frameFaceCropped = faceDetector.Detect(frameEqualized);
 
-                // TODO: MAKE FEATURE DETECTORS RETURN BOTH IMAGE AND RECTANGLE?
-                // SO YOU CAN GET EYE IMAGE FOR IRIS DETECTION
-                // AND LOCATION TO CALCULATE HEAD POSITION
-                 
+                // TODO: MODIFY OTHER FEATURE DETECTORS TO MATCH THE FACE DETECTOR
+                // HOW TO HANDLE POSITION DETECTION ERROR?
+                // MAYBE SET DETECTED POSITION TO (-1,-1)
+                // SO YOU CAN SKIP ORIENTATION CALC AND IRIS DETECTION?
+
                 // DETECT EYES AND NOSE
                 var nose = noseDetector.Detect(frameFaceCropped);
                 var leftEye = lEyeDetector.Detect(frameFaceCropped);
@@ -87,18 +84,17 @@ namespace EyeTracker
                 double roll = FaceOrientationUtil.CalculateFaceRoll(leftEye.Location, rightEye.Location);
 
                 // PUT RECTANGLES ON IMAGE
-                CvInvoke.Rectangle(frameFaceCropped, face, new MCvScalar(0, 255, 0), 2);
                 CvInvoke.Rectangle(frameFaceCropped, nose, new MCvScalar(255, 0, 0), 1);
                 CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
                 CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
 
                 // PUT TEXT ON IMAGE
-                CvInvoke.PutText(frameEqualized, "YAW: " + yaw.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
+                CvInvoke.PutText(frameFaceCropped, "YAW: " + yaw.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
                 //CvInvoke.PutText(frameEqualized, "ROLL: " + roll.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
                 //CvInvoke.PutText(frameEqualized, "PITCH: " + pitch.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
 
                 // SHOW IMAGE
-                CvInvoke.Imshow("faceDetection", frameEqualized);
+                CvInvoke.Imshow("faceDetection", frameFaceCropped);
 
                 // BREAK CONDITION
                 if (CvInvoke.WaitKey(1) == 27)

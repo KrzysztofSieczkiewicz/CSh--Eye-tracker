@@ -3,7 +3,7 @@ using EyeTracker.detection.utlis;
 
 namespace EyeTracker.detection.face
 {
-    internal class HaarFaceDetector : IFeatureDetector
+    internal class HaarFaceDetector
     {
         private CascadeClassifier faceClassifier = new CascadeClassifier("./classifiers/haarcascade_frontalface_default.xml");
         private PrevDetections prevFrameDetection = new PrevDetections(3);
@@ -13,19 +13,25 @@ namespace EyeTracker.detection.face
         private Size minSize = new Size(110, 110);
         private Size maxSize = new Size(275, 275);
 
+        private Rectangle _facePosition = new Rectangle();
+        public Rectangle FacePosition
+        {
+            get => _facePosition;
+            set => _facePosition = value;
+        }
 
-        public Rectangle Detect(Mat frame)
+        public Mat Detect(Mat frame)
         {
             var faces = faceClassifier.DetectMultiScale(frame, scaleFactor, minNeighbours, minSize, maxSize);
-            if (faces.Length == 0) return new Rectangle();
+            if (faces.Length == 0) return frame;
 
-            var averagedFace = RectanglesUtil.SpatialSmoothing(faces);
-            prevFrameDetection.AddResult(averagedFace);
+            Rectangle averagedDetection = RectanglesUtil.SpatialSmoothing(faces);
+            Rectangle smoothedDetection = RectanglesUtil.TemporalSmoothing(prevFrameDetection.Rects.ToArray(), averagedDetection);
 
-            var prevFramesRect = prevFrameDetection.Rects.ToArray();
-            var face = RectanglesUtil.TemporalSmoothing(prevFramesRect, averagedFace);
+            FacePosition = smoothedDetection;
+            prevFrameDetection.AddResult(averagedDetection);
 
-            return face;
+            return new Mat(frame, smoothedDetection);
         }
 
     }

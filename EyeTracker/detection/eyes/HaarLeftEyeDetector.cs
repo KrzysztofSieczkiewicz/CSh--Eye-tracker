@@ -13,6 +13,7 @@ namespace EyeTracker.detection.eyes
 
         public Rectangle Detect(Mat frame)
         {
+            // LIMIT DETECTION TO LEFT SIDE
             int sectionWidth = (int)(frame.Cols / 2);
             Rectangle leftFaceSide = new Rectangle(sectionWidth, 0, sectionWidth, (int)frame.Rows);
             Mat croppedImg = new Mat(frame, leftFaceSide);
