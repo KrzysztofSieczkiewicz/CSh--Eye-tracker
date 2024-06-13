@@ -16,8 +16,10 @@ namespace EyeTracker.detection.eyes
             Rectangle rightFaceSide = new Rectangle(0, 0, (frame.Cols / 2), (int)frame.Rows);
             Mat croppedImg = new Mat(frame, rightFaceSide);
 
-            var rightEyeRectangles = rightEyeClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
-            var averagedRightEye = RectanglesUtil.SpatialSmoothing(rightEyeRectangles);
+            var rightEyes = rightEyeClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
+            if (rightEyes.Length == 0) return new Rectangle();
+
+            var averagedRightEye = RectanglesUtil.SpatialSmoothing(rightEyes);
 
             prevDetection.AddResult(averagedRightEye);
             var prevRightEyes = prevDetection.Rects.ToArray();

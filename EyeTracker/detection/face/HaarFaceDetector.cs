@@ -17,11 +17,12 @@ namespace EyeTracker.detection.face
         public Rectangle Detect(Mat frame)
         {
             var faces = faceClassifier.DetectMultiScale(frame, scaleFactor, minNeighbours, minSize, maxSize);
+            if (faces.Length == 0) return new Rectangle();
+
             var averagedFace = RectanglesUtil.SpatialSmoothing(faces);
-
             prevFrameDetection.AddResult(averagedFace);
-            var prevFramesRect = prevFrameDetection.Rects.ToArray();
 
+            var prevFramesRect = prevFrameDetection.Rects.ToArray();
             var face = RectanglesUtil.TemporalSmoothing(prevFramesRect, averagedFace);
 
             return face;

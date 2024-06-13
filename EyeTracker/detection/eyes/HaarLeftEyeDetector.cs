@@ -13,12 +13,14 @@ namespace EyeTracker.detection.eyes
 
         public Rectangle Detect(Mat frame)
         {
-            int centerX = (int)(frame.Cols / 2);
-            Rectangle leftFaceSide = new Rectangle(centerX, 0, centerX, (int)frame.Rows);
+            int sectionWidth = (int)(frame.Cols / 2);
+            Rectangle leftFaceSide = new Rectangle(sectionWidth, 0, sectionWidth, (int)frame.Rows);
             Mat croppedImg = new Mat(frame, leftFaceSide);
 
-            var leftEyeRectangles = leftEyeClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
-            var averagedLeftEye = RectanglesUtil.SpatialSmoothing(leftEyeRectangles);
+            var leftEyes = leftEyeClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
+            if (leftEyes.Length == 0) return new Rectangle();
+
+            var averagedLeftEye = RectanglesUtil.SpatialSmoothing(leftEyes);
 
             prevDetection.AddResult(averagedLeftEye);
             var prevLeftEyes = prevDetection.Rects.ToArray();
@@ -26,7 +28,7 @@ namespace EyeTracker.detection.eyes
             var leftEye = RectanglesUtil.TemporalSmoothing(prevLeftEyes, averagedLeftEye);
 
             // Move rectangle to match original image coordinates
-            leftEye.X += centerX;
+            leftEye.X += sectionWidth;
 
             return leftEye;
         }

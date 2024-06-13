@@ -3,18 +3,12 @@
     internal static class RectanglesUtil
     {
         /* 
-         * Calculates center point for provided rectangle
-        */
-        public static Point GetCenter(Rectangle rect)
-        {
-            return new Point(rect.Location.X + rect.Width, rect.Location.Y + rect.Height);
-        }
-
-        /* 
          * Averages provided rectangles
         */
         public static Rectangle SpatialSmoothing(Rectangle[] rectangles)
         {
+            if (rectangles.Length == 1) return rectangles[0];
+
             int sumX=0;
             int sumY=0;
             int sumWidth=0;
@@ -29,6 +23,7 @@
             }
 
             int count = rectangles.Length;
+
             int avgX = sumX/ count;
             int avgY = sumY/ count;
             int avgWidth = sumWidth/ count;
