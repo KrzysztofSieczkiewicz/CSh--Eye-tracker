@@ -3,7 +3,7 @@ using EyeTracker.detection.utlis;
 
 namespace EyeTracker.detection.eyes
 {
-    internal class HaarRightEyeDetector : IFeatureDetector
+    internal class HaarRightEyeDetector
     {
         private CascadeClassifier rightEyeClassifier = new CascadeClassifier("./classifiers/haarcascade_righteye_2splits.xml");
         private PrevDetections prevDetection = new PrevDetections(3);
@@ -11,22 +11,32 @@ namespace EyeTracker.detection.eyes
         double scaleFactor = 1.1;
         int minNeighbours = 2;
 
-        public Rectangle Detect(Mat frame)
+        private Point _position = new Point();
+        public Point Position
         {
-            Rectangle rightFaceSide = new Rectangle(0, 0, (frame.Cols / 2), (int)frame.Rows);
+            get => _position;
+            set => _position = value;
+        }
+
+        public Mat Detect(Mat frame)
+        {
+            Rectangle rightFaceSide = new Rectangle(0, 0, frame.Cols / 2, frame.Rows);
             Mat croppedImg = new Mat(frame, rightFaceSide);
 
             var rightEyes = rightEyeClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
-            if (rightEyes.Length == 0) return new Rectangle();
+            if (rightEyes.Length == 0)
+            {
+                Position = new Point(-1, -1);
+                return frame;
+            }
 
-            var averagedRightEye = RectanglesUtil.SpatialSmoothing(rightEyes);
+            var averagedDetection = RectanglesUtil.SpatialSmoothing(rightEyes);
+            var smoothedDetection = RectanglesUtil.TemporalSmoothing(prevDetection.Rects.ToArray(), averagedDetection);
 
-            prevDetection.AddResult(averagedRightEye);
-            var prevRightEyes = prevDetection.Rects.ToArray();
+            Position = smoothedDetection.Location;
+            prevDetection.AddResult(smoothedDetection);
 
-            var rightEye = RectanglesUtil.TemporalSmoothing(prevRightEyes, averagedRightEye);
-
-            return rightEye;
+            return new Mat(frame, smoothedDetection);
         }
     }
 }

@@ -13,22 +13,26 @@ namespace EyeTracker.detection.face
         private Size minSize = new Size(110, 110);
         private Size maxSize = new Size(275, 275);
 
-        private Rectangle _facePosition = new Rectangle();
-        public Rectangle FacePosition
+        private Point _position = new Point();
+        public Point Position
         {
-            get => _facePosition;
-            set => _facePosition = value;
+            get => _position;
+            set => _position = value;
         }
 
         public Mat Detect(Mat frame)
         {
             var faces = faceClassifier.DetectMultiScale(frame, scaleFactor, minNeighbours, minSize, maxSize);
-            if (faces.Length == 0) return frame;
+            if (faces.Length == 0)
+            {
+                Position = new Point(-1, -1);
+                return frame;
+            }
 
             Rectangle averagedDetection = RectanglesUtil.SpatialSmoothing(faces);
             Rectangle smoothedDetection = RectanglesUtil.TemporalSmoothing(prevFrameDetection.Rects.ToArray(), averagedDetection);
 
-            FacePosition = smoothedDetection;
+            Position = smoothedDetection.Location;
             prevFrameDetection.AddResult(averagedDetection);
 
             return new Mat(frame, smoothedDetection);

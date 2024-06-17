@@ -66,35 +66,35 @@ namespace EyeTracker
                 CvInvoke.EqualizeHist(frameGray, frameEqualized);
 
                 // DETECT FACE AND CROP IMAGE
-                Mat frameFaceCropped = faceDetector.Detect(frameEqualized);
-
-                // TODO: MODIFY OTHER FEATURE DETECTORS TO MATCH THE FACE DETECTOR
-                // HOW TO HANDLE POSITION DETECTION ERROR?
-                // MAYBE SET DETECTED POSITION TO (-1,-1)
-                // SO YOU CAN SKIP ORIENTATION CALC AND IRIS DETECTION?
+                Mat faceImg = faceDetector.Detect(frameEqualized);
+                if (faceDetector.Position == new Point(-1, -1)) continue;
 
                 // DETECT EYES AND NOSE
-                var nose = noseDetector.Detect(frameFaceCropped);
-                var leftEye = lEyeDetector.Detect(frameFaceCropped);
-                var rightEye = rEyeDetector.Detect(frameFaceCropped);
+                var noseImg = noseDetector.Detect(faceImg);
+                var leftEyeImg = lEyeDetector.Detect(faceImg);
+                var rightEyeImg = rEyeDetector.Detect(faceImg);
+
+                if (noseDetector.Position == new Point(-1, -1) || 
+                    lEyeDetector.Position == new Point(-1, -1) || 
+                    rEyeDetector.Position == new Point(-1, -1)) continue;
 
                 // CALCULATE FACE ORIENTATION
-                double yaw = FaceOrientationUtil.CalculateFaceYaw(leftEye.Location, rightEye.Location, nose.Location);
-                double pitch = FaceOrientationUtil.CalculateFacePitch(leftEye.Location, rightEye.Location, nose.Location);
-                double roll = FaceOrientationUtil.CalculateFaceRoll(leftEye.Location, rightEye.Location);
+                double yaw = FaceOrientationUtil.CalculateFaceYaw(lEyeDetector.Position, rEyeDetector.Position, noseDetector.Position);
+                double pitch = FaceOrientationUtil.CalculateFacePitch(lEyeDetector.Position, rEyeDetector.Position, noseDetector.Position);
+                double roll = FaceOrientationUtil.CalculateFaceRoll(lEyeDetector.Position, rEyeDetector.Position);
 
                 // PUT RECTANGLES ON IMAGE
-                CvInvoke.Rectangle(frameFaceCropped, nose, new MCvScalar(255, 0, 0), 1);
-                CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
-                CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
+                //CvInvoke.Rectangle(frameFaceCropped, nose, new MCvScalar(255, 0, 0), 1);
+                //CvInvoke.Rectangle(frameFaceCropped, leftEye, new MCvScalar(255, 0, 0), 1);
+                //CvInvoke.Rectangle(frameFaceCropped, rightEye, new MCvScalar(255, 0, 0), 1);
 
                 // PUT TEXT ON IMAGE
-                CvInvoke.PutText(frameFaceCropped, "YAW: " + yaw.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
+                CvInvoke.PutText(faceImg, "YAW: " + yaw.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
                 //CvInvoke.PutText(frameEqualized, "ROLL: " + roll.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
                 //CvInvoke.PutText(frameEqualized, "PITCH: " + pitch.ToString(), new Point(15, 15), Emgu.CV.CvEnum.FontFace.HersheySimplex, 0.75, new MCvScalar(255, 0, 0));
 
                 // SHOW IMAGE
-                CvInvoke.Imshow("faceDetection", frameFaceCropped);
+                CvInvoke.Imshow("faceDetection", faceImg);
 
                 // BREAK CONDITION
                 if (CvInvoke.WaitKey(1) == 27)

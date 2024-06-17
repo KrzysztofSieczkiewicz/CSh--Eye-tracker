@@ -3,7 +3,7 @@ using EyeTracker.detection.utlis;
 
 namespace EyeTracker.detection.eyes
 {
-    internal class HaarLeftEyeDetector : IFeatureDetector
+    internal class HaarLeftEyeDetector
     {
         private CascadeClassifier leftEyeClassifier = new CascadeClassifier("./classifiers/haarcascade_lefteye_2splits.xml");
         private PrevDetections prevDetection = new PrevDetections(3);
@@ -11,27 +11,36 @@ namespace EyeTracker.detection.eyes
         double scaleFactor = 1.1;
         int minNeighbours = 2;
 
-        public Rectangle Detect(Mat frame)
+        private Point _position = new Point();
+        public Point Position
         {
-            // LIMIT DETECTION TO LEFT SIDE
-            int sectionWidth = (int)(frame.Cols / 2);
-            Rectangle leftFaceSide = new Rectangle(sectionWidth, 0, sectionWidth, (int)frame.Rows);
+            get => _position;
+            set => _position = value;
+        }
+
+        public Mat Detect(Mat frame)
+        {
+            int sectionWidth = frame.Cols / 2;
+            Rectangle leftFaceSide = new Rectangle(sectionWidth, 0, sectionWidth, frame.Rows);
             Mat croppedImg = new Mat(frame, leftFaceSide);
 
             var leftEyes = leftEyeClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
-            if (leftEyes.Length == 0) return new Rectangle();
+            if (leftEyes.Length == 0)
+            {
+                Position = new Point(-1, -1);
+                return frame;
+            }
 
-            var averagedLeftEye = RectanglesUtil.SpatialSmoothing(leftEyes);
+            var averagedDetection = RectanglesUtil.SpatialSmoothing(leftEyes);
+            var smoothedDetection = RectanglesUtil.TemporalSmoothing(prevDetection.Rects.ToArray(), averagedDetection);
 
-            prevDetection.AddResult(averagedLeftEye);
-            var prevLeftEyes = prevDetection.Rects.ToArray();
+            // OFFSET DETECTION COORDINATES
+            var newPosition = new Point(smoothedDetection.X + sectionWidth, smoothedDetection.Y);
 
-            var leftEye = RectanglesUtil.TemporalSmoothing(prevLeftEyes, averagedLeftEye);
+            Position = newPosition;
+            prevDetection.AddResult(smoothedDetection);
 
-            // Move rectangle to match original image coordinates
-            leftEye.X += sectionWidth;
-
-            return leftEye;
+            return new Mat(frame, smoothedDetection);
         }
     }
 }

@@ -3,7 +3,7 @@ using EyeTracker.detection.utlis;
 
 namespace EyeTracker.detection.nose
 {
-    internal class HaarNoseDetector : IFeatureDetector
+    internal class HaarNoseDetector
     {
         private CascadeClassifier noseClassifier = new CascadeClassifier("./classifiers/haarcascade_mcs_nose.xml");
         private PrevDetections prevDetection = new PrevDetections(3);
@@ -11,29 +11,38 @@ namespace EyeTracker.detection.nose
         double scaleFactor = 1.1;
         int minNeighbours = 6;
 
-        public Rectangle Detect(Mat frame)
+        private Point _Position = new Point();
+        public Point Position
         {
-            int sectionHeight = (int)(frame.Rows * 2 / 3);
+            get => _Position;
+            set => _Position = value;
+        }
 
-            int startY = (int)(frame.Rows * 1.0 / 3);
+        public Mat Detect(Mat frame)
+        {
+            int sectionHeight = frame.Rows * 2 / 3;
+            int startY = frame.Rows * 1 / 3;
 
-            Rectangle sectionRect = new Rectangle(0, startY, (int)frame.Cols, sectionHeight);
+            Rectangle sectionRect = new Rectangle(0, startY, frame.Cols, sectionHeight);
             Mat croppedImg = new Mat(frame, sectionRect);
 
             var noses = noseClassifier.DetectMultiScale(croppedImg, scaleFactor, minNeighbours);
-            if (noses.Length == 0) return new Rectangle();
+            if (noses.Length == 0)
+            {
+                Position = new Point(-1, -1);
+                return frame;
+            }
 
-            var averagedNose = RectanglesUtil.SpatialSmoothing(noses);
+            var averagedDetection = RectanglesUtil.SpatialSmoothing(noses);
+            var smoothedDetection = RectanglesUtil.TemporalSmoothing(prevDetection.Rects.ToArray(), averagedDetection);
 
-            prevDetection.AddResult(averagedNose);
-            var prevNoses = prevDetection.Rects.ToArray();
+            // OFFSET DETECTION COORDINATES
+            var newPosition = new Point(smoothedDetection.X, smoothedDetection.Y + sectionHeight);
 
-            var nose = RectanglesUtil.TemporalSmoothing(prevNoses, averagedNose);
+            Position = newPosition;
+            prevDetection.AddResult(smoothedDetection);
 
-            // Move rectangle to match original image coordinates
-            nose.Y += startY;
-
-            return nose;
+            return new Mat(frame, smoothedDetection);
         }
     }
 }
