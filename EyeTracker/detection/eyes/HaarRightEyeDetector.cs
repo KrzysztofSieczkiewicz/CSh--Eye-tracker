@@ -3,7 +3,7 @@ using EyeTracker.detection.utlis;
 
 namespace EyeTracker.detection.eyes
 {
-    internal class HaarRightEyeDetector
+    internal class HaarRightEyeDetector: IFeatureDetector
     {
         private CascadeClassifier rightEyeClassifier = new CascadeClassifier("./classifiers/haarcascade_righteye_2splits.xml");
         private PrevDetections prevDetection = new PrevDetections(3);

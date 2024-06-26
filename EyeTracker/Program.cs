@@ -1,11 +1,9 @@
 using Emgu.CV;
 using Emgu.CV.Structure;
-using EyeTracker.detection;
 using EyeTracker.detection.eyes;
 using EyeTracker.detection.face;
 using EyeTracker.detection.nose;
 using EyeTracker.detection.utils;
-using EyeTracker.detection.utlis;
 
 namespace EyeTracker
 {

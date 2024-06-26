@@ -4,6 +4,8 @@ namespace EyeTracker.detection
 {
     internal interface IFeatureDetector
     {
-        Rectangle Detect(Mat frame);
+        Point Position { get; set; }
+
+        Mat Detect(Mat frame);
     }
 }
